@@ -44,47 +44,12 @@ gl.linkProgram(program);
 gl.useProgram(program);
 
 const positionPointer = gl.getAttribLocation(program, 'position');
-
-const positionData = new Float32Array([
-  -0.9,
-  -0.9,
-
-  -0.8,
-  -0.75,
-
-  -0.7,
-  -0.5,
-
-  -0.55,
-  0.0,
-
-  -0.4,
-  0.5,
-
-  -0.25,
-  0.8,
-
-  0.0,
-  0.9,
-
-  0.25,
-  0.8,
-
-  0.4,
-  0.5,
-
-  0.55,
-  0.0,
-
-  0.7,
-  -0.5,
-
-  0.8,
-  -0.75,
-
-  0.9,
-  -0.9
-]);
+const cosPositionsArray = [];
+for (let i = -5; i < 5; i += 0.01) {
+  cosPositionsArray.push(i);
+  cosPositionsArray.push(Math.cos(i * Math.PI));
+}
+const positionData = new Float32Array(cosPositionsArray);
 
 const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
 
