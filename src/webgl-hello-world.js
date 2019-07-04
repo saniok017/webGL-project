@@ -10,8 +10,8 @@ const vShaderSource = `
 attribute vec2 position;
 
 void main() {
-  gl_PointSize = 20.0;
-  gl_Position = vec4(position / 2.0, 0, 1);
+  gl_PointSize = 10.0;
+  gl_Position = vec4(position, 0, 1);
 }
 `;
 
@@ -46,17 +46,44 @@ gl.useProgram(program);
 const positionPointer = gl.getAttribLocation(program, 'position');
 
 const positionData = new Float32Array([
-  -1.0, // top left x
-  -1.0, // top left y
+  -0.9,
+  -0.9,
 
-  1.0, // point 2 x
-  1.0, // point 2 y
+  -0.8,
+  -0.75,
 
-  -1.0, // point 3 x
-  1.0, // point 3 y
+  -0.7,
+  -0.5,
 
-  1.0, // point 4 x
-  -1.0, // point 4 y
+  -0.55,
+  0.0,
+
+  -0.4,
+  0.5,
+
+  -0.25,
+  0.8,
+
+  0.0,
+  0.9,
+
+  0.25,
+  0.8,
+
+  0.4,
+  0.5,
+
+  0.55,
+  0.0,
+
+  0.7,
+  -0.5,
+
+  0.8,
+  -0.75,
+
+  0.9,
+  -0.9
 ]);
 
 const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
