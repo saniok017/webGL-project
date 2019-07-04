@@ -7,9 +7,11 @@ const vertexShader = gl.createShader(gl.VERTEX_SHADER);
 const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
 
 const vShaderSource = `
+attribute vec2 position;
+
 void main() {
   gl_PointSize = 20.0;
-  gl_Position = vec4(0, 0, 0, 1);
+  gl_Position = vec4(position / 2.0, 0, 1);
 }
 `;
 
@@ -41,4 +43,34 @@ gl.linkProgram(program);
 
 gl.useProgram(program);
 
-gl.drawArrays(gl.POINTS, 0, 1);
+const positionPointer = gl.getAttribLocation(program, 'position');
+
+const positionData = new Float32Array([
+  -1.0, // top left x
+  -1.0, // top left y
+
+  1.0, // point 2 x
+  1.0, // point 2 y
+
+  -1.0, // point 3 x
+  1.0, // point 3 y
+
+  1.0, // point 4 x
+  -1.0, // point 4 y
+]);
+
+const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
+
+gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+gl.bufferData(gl.ARRAY_BUFFER, positionData, gl.STATIC_DRAW);
+
+const attributeSize = 2;
+const type = gl.FLOAT;
+const normalized = false;
+const stride = 0;
+const offset = 0;
+
+gl.enableVertexAttribArray(positionPointer);
+gl.vertexAttribPointer(positionPointer, attributeSize, type, normalized, stride, offset);
+
+gl.drawArrays(gl.POINTS, 0, positionData.length / 2);
