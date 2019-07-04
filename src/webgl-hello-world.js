@@ -2,6 +2,7 @@ const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
 
 const program = gl.createProgram();
+const cosMultiplier = 20;
 
 const vertexShader = gl.createShader(gl.VERTEX_SHADER);
 const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
@@ -10,8 +11,8 @@ const vShaderSource = `
 attribute vec2 position;
 
 void main() {
-  gl_PointSize = 10.0;
-  gl_Position = vec4(position, 0, 1);
+  gl_PointSize = 2.0;
+  gl_Position = vec4(position, 0, ${cosMultiplier});
 }
 `;
 
@@ -45,9 +46,9 @@ gl.useProgram(program);
 
 const positionPointer = gl.getAttribLocation(program, 'position');
 const cosPositionsArray = [];
-for (let i = -5; i < 5; i += 0.01) {
+for (let i = -cosMultiplier; i < cosMultiplier; i += 0.01) {
   cosPositionsArray.push(i);
-  cosPositionsArray.push(Math.cos(i * Math.PI));
+  cosPositionsArray.push(Math.cos(i * Math.PI) * cosMultiplier);
 }
 const positionData = new Float32Array(cosPositionsArray);
 
