@@ -20,8 +20,11 @@ void main() {
 `;
 
 const fShaderSource = `
+  precision mediump float;
+  uniform vec4 color;
+
   void main() {
-    gl_FragColor = vec4(1, 0, 0, 1);
+    gl_FragColor = color / 255.0;
   }
 `
 
@@ -49,21 +52,18 @@ gl.useProgram(program);
 
 const positionPointer = gl.getAttribLocation(program, 'position');
 const resolutionUniformLocation = gl.getUniformLocation(program, 'resolution');
+const colorUniformLocation = gl.getUniformLocation(program, 'color');
 
 gl.uniform2fv(resolutionUniformLocation, [canvas.width, canvas.height]);
+gl.uniform4fv(colorUniformLocation, [255, 0, 0, 255])
 
-const lines = [];
-let prevLineY = 0;
+const triangles = [
+  0, 0, // v1 (x, y)
+  canvas.width / 2, canvas.height, // v2 (x, y)
+  canvas.width, 0, // v3 (x, y)
+];
 
-for (let i = 0; i < canvas.width - 5; i += 5) {
-  lines.push(i, prevLineY);
-  const y = Math.random() * canvas.height;
-  lines.push(i + 5, y);
-
-  prevLineY = y;
-}
-
-const positionData = new Float32Array(lines);
+const positionData = new Float32Array(triangles);
 
 const positionBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
 
@@ -80,4 +80,4 @@ const offset = 0;
 gl.enableVertexAttribArray(positionPointer);
 gl.vertexAttribPointer(positionPointer, attributeSize, type, normalized, stride, offset);
 
-gl.drawArrays(gl.LINES, 0, positionData.length / 2);
+gl.drawArrays(gl.TRIANGLES, 0, positionData.length / 2);
