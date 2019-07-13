@@ -59,9 +59,9 @@ gl.uniform4fv(colorUniformLocation, [255, 0, 0, 255])
 
 const angles = []
 
-const triangles = createHexagon(canvas.width / 2, canvas.height / 2, canvas.height / 2, 7);
+const triangles = createcircle(canvas.width / 2, canvas.height / 2, canvas.height / 2, 360);
 
-function createHexagon(centerX, centerY, radius, segmentsCount) {
+function createcircle(centerX, centerY, radius, segmentsCount) {
   const vertices = [];
   const segmentAngle = Math.PI * 2 / (segmentsCount - 1);
   for (let i = 0; i < Math.PI * 2; i += segmentAngle) {
