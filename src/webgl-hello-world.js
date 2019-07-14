@@ -30,6 +30,7 @@ const fShaderSource = `
 
   void main() {
     gl_FragColor = vColor / 255.0;
+    gl_FragColor.a = 1.0;
   }
 `
 
@@ -71,27 +72,15 @@ const rainbowColors = [
   [0.0, 0.0, 255, 255], // blue,
   [128, 0.0, 128, 255], // purple
 ];
-const triangles = createPolygons(canvas.width / 2, canvas.height / 2, canvas.height / 2, 8);
+const triangles = createRect(0, 0, canvas.height, canvas.height);
 
-function createPolygons(centerX, centerY, radius, segmentsCount) {
-  const vertexData = [];
-  const segmentAngle = Math.PI * 2 / (segmentsCount - 1);
-  for (let i = 0; i < Math.PI * 2; i += segmentAngle) {
-    const from = i;
-    const to = i + segmentAngle;
-
-    const color = rainbowColors[i / segmentAngle];
-
-    vertexData.push(centerX, centerY);
-    vertexData.push(...color);
-
-    vertexData.push(centerX + Math.cos(from) * radius, centerY + Math.sin(from) * radius);
-    vertexData.push(...color);
-
-    vertexData.push(centerX + Math.cos(to) * radius, centerY + Math.sin(to) * radius);
-    vertexData.push(...color);
-  }
-  return vertexData;
+function createRect(top, left, width, height) {
+  return [
+    left, top, // x1 y1
+    left + width, top, // x2 y2
+    left, top + height, // x3 y3
+    left + width, top + height, // x4 y4
+  ];
 }
 
 function fillWithColors(segmentsCount) {
@@ -109,6 +98,16 @@ function fillWithColors(segmentsCount) {
 const vertexData = new Float32Array(triangles);
 const vertexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
 
+const indexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
+
+const indexData = new Uint8Array([
+  0, 1, 2,
+  1, 2, 3,
+]);
+
+gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW);
+
 gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, vertexData, gl.STATIC_DRAW);
 gl.lineWidth(1);
@@ -116,13 +115,13 @@ gl.lineWidth(1);
 const attributeSize = 2;
 const type = gl.FLOAT;
 const normalized = false;
-const stride = 24;
+const stride = 0;
 const offset = 0;
 
 gl.enableVertexAttribArray(positionLocation);
 gl.vertexAttribPointer(positionLocation, attributeSize, type, normalized, stride, offset);
 
-gl.enableVertexAttribArray(colorLocation);
-gl.vertexAttribPointer(colorLocation, 4, type, normalized, stride, 8);
+// gl.enableVertexAttribArray(colorLocation);
+// gl.vertexAttribPointer(colorLocation, 4, type, normalized, stride, 8);
 
-gl.drawArrays(gl.TRIANGLES, 0, vertexData.length / 6);
+gl.drawElements(gl.TRIANGLES, indexData.length, gl.UNSIGNED_BYTE, 0);
