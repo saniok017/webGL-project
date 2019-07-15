@@ -1,0 +1,27 @@
+{
+  "name": "web_gl-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --mode production",
+    "dev": "webpack-dev-server --mode development --open",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saniok017/webGL-project.git"
+  },
+  "author": "saniok017",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/saniok017/webGL-project/issues"
+  },
+  "homepage": "https://github.com/saniok017/webGL-project#readme",
+  "devDependencies": {
+    "raw-loader": "^3.0.0",
+    "webpack": "^4.35.3",
+    "webpack-cli": "^3.3.6",
+    "webpack-dev-server": "^3.7.2"
+  }
+}
