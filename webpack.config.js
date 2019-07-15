@@ -16,9 +16,14 @@ module.exports = {
 
   module: {
     rules: [{
-      test: /\.glsl$/,
-      use: 'raw-loader',
-    }, ],
+        test: /\.glsl$/,
+        use: 'raw-loader',
+      },
+      {
+        test: /\.jpg$/,
+        use: 'url-loader',
+      },
+    ],
   },
 
   mode: 'development',
