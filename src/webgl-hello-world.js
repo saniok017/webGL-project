@@ -32,7 +32,7 @@ const fShaderSource = `
     gl_FragColor = vColor / 255.0;
     gl_FragColor.a = 1.0;
   }
-`
+`;
 
 function compileShader(shader, source) {
   gl.shaderSource(shader, source);
@@ -44,7 +44,6 @@ function compileShader(shader, source) {
     throw new Error(log);
   }
 }
-
 
 compileShader(vertexShader, vShaderSource);
 compileShader(fragmentShader, fShaderSource);
@@ -72,15 +71,18 @@ const rainbowColors = [
   [0.0, 0.0, 255, 255], // blue,
   [128, 0.0, 128, 255], // purple
 ];
-const triangles = createRect(0, 0, canvas.height, canvas.height);
+const trianglesCount = Math.round(Math.random() * 100);
 
-function createRect(top, left, width, height) {
-  return [
-    left, top, // x1 y1
-    left + width, top, // x2 y2
-    left, top + height, // x3 y3
-    left + width, top + height, // x4 y4
-  ];
+const triangles = createCoordinates(0, 0, canvas.height, canvas.height, trianglesCount);
+
+function createCoordinates(top, left, width, height, limit) {
+  const vertices = [];
+
+  for (let i = 0; i < limit; i++) {
+    vertices.push(Math.random() * width, Math.random() * height);
+  }
+
+  return vertices;
 }
 
 function fillWithColors(segmentsCount) {
@@ -100,10 +102,17 @@ const vertexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
 
 const indexBuffer = gl.createBuffer(gl.ARRAY_BUFFER);
 
-const indexData = new Uint8Array([
-  0, 1, 2,
-  1, 2, 3,
-]);
+function createshapes(trianglesCount) {
+  const indexes = [];
+  for (let i = 0; i < trianglesCount / 3; i++) {
+    indexes.push(i, i + 1, i + 2);
+  }
+
+  return indexes;
+}
+
+const verticeIndexes = createshapes(trianglesCount);
+const indexData = new Uint8Array(verticeIndexes);
 
 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
 gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indexData, gl.STATIC_DRAW);
