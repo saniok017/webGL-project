@@ -1,3 +1,5 @@
+import extract from 'glsl-extract-sync';
+
 export function compileShader(gl, shader, source) {
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
@@ -6,6 +8,36 @@ export function compileShader(gl, shader, source) {
 
     if (log) {
         throw new Error(log);
+    }
+}
+
+export function setupShaderInput(gl, program, vShaderSource, fShaderSource) {
+    const vShaderInfo = extract(vShaderSource);
+    const fShaderInfo = extract(fShaderSource);
+
+    const attributes = vShaderInfo.attributes;
+    const uniforms = [
+        ...vShaderInfo.uniforms,
+        ...fShaderInfo.uniforms,
+    ];
+
+    const attributeLocations = attributes.reduce((attrsMap, attr) => {
+       attrsMap[attr.name] = gl.getAttribLocation(program, attr.name);
+       return attrsMap;
+   }, {});
+
+    attributes.forEach((attr) => {
+       gl.enableVertexAttribArray(attributeLocations[attr.name]);
+   });
+
+    const uniformLocations = uniforms.reduce((uniformsMap, uniform) => {
+        uniformsMap[uniform.name] = gl.getUniformLocation(program, uniform.name);
+        return uniformsMap;
+    }, {});
+
+    return {
+        attributeLocations,
+        uniformLocations,
     }
 }
 

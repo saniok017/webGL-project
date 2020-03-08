@@ -1,7 +1,8 @@
 import vShaderSource from './shaders/texture.v.glsl';
 import fShaderSource from './shaders/texture.f.glsl';
-import { compileShader, loadImage, createTexture, setImage } from './gl-helpers';
+import { compileShader, loadImage, createTexture, setImage, setupShaderInput } from './gl-helpers';
 import { createRect } from './shape-helpers';
+import { GLBuffer } from './GLBuffer';
 
 import textureImageSrc from '../assets/images/texture.jpg';
 import textureGreenImageSrc from '../assets/images/texture-green.jpg';
@@ -23,70 +24,43 @@ gl.attachShader(program, fShader);
 gl.linkProgram(program);
 gl.useProgram(program);
 
-const texCoords = new Float32Array([
+const texCoordsBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
     ...createRect(0, 0, 1, 1), // left rect
     ...createRect(0, 0, 1, 1), // right rect
-]);
-const texCoordsBuffer = gl.createBuffer();
+]), gl.STATIC_DRAW);
 
-gl.bindBuffer(gl.ARRAY_BUFFER, texCoordsBuffer);
-gl.bufferData(gl.ARRAY_BUFFER, texCoords, gl.STATIC_DRAW);
-
-const texIndicies = new Float32Array([
+const texIndiciesBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
     ...Array.from({ length: 4 }).fill(0), // left rect
     ...Array.from({ length: 4 }).fill(1), // right rect
-]);
-const texIndiciesBuffer = gl.createBuffer();
+]), gl.STATIC_DRAW);
 
-gl.bindBuffer(gl.ARRAY_BUFFER, texIndiciesBuffer);
-gl.bufferData(gl.ARRAY_BUFFER, texIndicies, gl.STATIC_DRAW);
-
-const vertexPosition = new Float32Array([
+const vertexPositionBuffer = new GLBuffer(gl, gl.ARRAY_BUFFER, new Float32Array([
     ...createRect(-1, -1, 1, 2), // left rect
     ...createRect(-1, 0, 1, 2), // right rect
-]);
-const vertexPositionBuffer = gl.createBuffer();
+]), gl.STATIC_DRAW);
 
-gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
-gl.bufferData(gl.ARRAY_BUFFER, vertexPosition, gl.STATIC_DRAW);
+const programInfo = setupShaderInput(gl, program, vShaderSource, fShaderSource);
 
-const attributeLocations = {
-    position: gl.getAttribLocation(program, 'position'),
-    texCoord: gl.getAttribLocation(program, 'texCoord'),
-    texIndex: gl.getAttribLocation(program, 'texIndex'),
-};
+vertexPositionBuffer.bind(gl);
 
-const uniformLocations = {
-    texture: gl.getUniformLocation(program, 'texture'),
-    otherTexture: gl.getUniformLocation(program, 'otherTexture'),
-    resolution: gl.getUniformLocation(program, 'resolution'),
-};
+gl.vertexAttribPointer(programInfo.attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
 
-gl.enableVertexAttribArray(attributeLocations.position);
-gl.vertexAttribPointer(attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
+texCoordsBuffer.bind(gl);
 
-gl.bindBuffer(gl.ARRAY_BUFFER, texCoordsBuffer);
+gl.vertexAttribPointer(programInfo.attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
 
-gl.enableVertexAttribArray(attributeLocations.texCoord);
-gl.vertexAttribPointer(attributeLocations.texCoord, 2, gl.FLOAT, false, 0, 0);
+texIndiciesBuffer.bind(gl);
 
-gl.bindBuffer(gl.ARRAY_BUFFER, texIndiciesBuffer);
+gl.vertexAttribPointer(programInfo.attributeLocations.texIndex, 1, gl.FLOAT, false, 0, 0);
 
-gl.enableVertexAttribArray(attributeLocations.texIndex);
-gl.vertexAttribPointer(attributeLocations.texIndex, 1, gl.FLOAT, false, 0, 0);
-
-const vertexIndices = new Uint8Array([
+const indexBuffer = new GLBuffer(gl, gl.ELEMENT_ARRAY_BUFFER, new Uint8Array([
     // left rect
     0, 1, 2,
     1, 2, 3,
     // right rect
     4, 5, 6,
     5, 6, 7,
-]);
-const indexBuffer = gl.createBuffer();
-
-gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, vertexIndices, gl.STATIC_DRAW);
+]), gl.STATIC_DRAW);
 
 loadImage(textureImageSrc).then((textureImg) => {
     Promise.all([
@@ -101,13 +75,13 @@ loadImage(textureImageSrc).then((textureImg) => {
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.uniform1i(uniformLocations.texture, 0);
+    gl.uniform1i(programInfo.uniformLocations.texture, 0);
 
     gl.activeTexture(gl.TEXTURE1);
     gl.bindTexture(gl.TEXTURE_2D, otherTexture);
-    gl.uniform1i(uniformLocations.otherTexture, 1);
+    gl.uniform1i(programInfo.uniformLocations.otherTexture, 1);
 
-    gl.uniform2fv(uniformLocations.resolution, [canvas.width, canvas.height]);
+    gl.uniform2fv(programInfo.uniformLocations.resolution, [canvas.width, canvas.height]);
 
-    gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
+    gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
 })});
