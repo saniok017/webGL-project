@@ -10,6 +10,16 @@ import textureGreenImageSrc from '../assets/images/texture-green.jpg';
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
 
+const width = document.body.offsetWidth;
+const height = document.body.offsetHeight;
+
+canvas.width = width * devicePixelRatio;
+canvas.height = height * devicePixelRatio;
+
+// downscale canvas to a physical size for retina
+canvas.style.width = `${width}px`;
+canvas.style.height = `${height}px`;
+
 const vShader = gl.createShader(gl.VERTEX_SHADER);
 const fShader = gl.createShader(gl.FRAGMENT_SHADER);
 
@@ -83,5 +93,22 @@ loadImage(textureImageSrc).then((textureImg) => {
 
     gl.uniform2fv(programInfo.uniformLocations.resolution, [canvas.width, canvas.height]);
 
+    gl.viewport(0, 0, canvas.width, canvas.height);
+
     gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
 })});
+
+window.addEventListener('resize', () => {
+    const width = document.body.offsetWidth;
+    const height = document.body.offsetHeight;
+
+    canvas.width = width * devicePixelRatio;
+    canvas.height = height * devicePixelRatio;
+
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+
+    gl.viewport(0, 0, canvas.width, canvas.height);
+
+    gl.drawElements(gl.TRIANGLES, indexBuffer.data.length, gl.UNSIGNED_BYTE, 0);
+});
