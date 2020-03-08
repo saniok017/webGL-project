@@ -1,13 +1,9 @@
 import vShaderSource from './shaders/texture.v.glsl';
 import fShaderSource from './shaders/texture.f.glsl';
-import {
-  createRect
-} from './shape-helpers';
-import {
-  compileShader,
-  loadImage
-} from './gl-helpers';
+import { compileShader, loadImage } from './gl-helpers';
+import { createRect } from './shape-helpers';
 
+import textureImageSrc from '../assets/images/texture.jpg';
 
 const canvas = document.querySelector('canvas');
 const gl = canvas.getContext('webgl');
@@ -33,8 +29,13 @@ gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, vertexPosition, gl.STATIC_DRAW);
 
 const attributeLocations = {
-  position: gl.getAttribLocation(program, 'position'),
-}
+    position: gl.getAttribLocation(program, 'position'),
+};
+
+const uniformLocations = {
+    texture: gl.getUniformLocation(program, 'texture'),
+    resolution: gl.getUniformLocation(program, 'resolution'),
+};
 
 gl.enableVertexAttribArray(attributeLocations.position);
 gl.vertexAttribPointer(attributeLocations.position, 2, gl.FLOAT, false, 0, 0);
@@ -45,17 +46,29 @@ const indexBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
 gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, vertexIndices, gl.STATIC_DRAW);
 
-gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
-
 loadImage(textureImageSrc).then((textureImg) => {
-  const texture = gl.createTexture();
+    const texture = gl.createTexture();
 
-  gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
 
-  gl.texImage2D(
-    gl.TEXTURE_2D,
-    0,
-  );
+    gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        textureImg,
+    );
 
-  gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+    gl.activeTexture(gl.TEXTURE0);
+    gl.uniform1i(uniformLocations.texture, 0);
+
+    gl.uniform2fv(uniformLocations.resolution, [canvas.width, canvas.height]);
+
+    gl.drawElements(gl.TRIANGLES, vertexIndices.length, gl.UNSIGNED_BYTE, 0);
 });

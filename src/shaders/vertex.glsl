@@ -1,5 +1,4 @@
 attribute vec2 position;
-attribute vec4 color;
 uniform vec2 resolution;
 
 #define M_PI 3.1415926535897932384626433832795

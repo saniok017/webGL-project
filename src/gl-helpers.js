@@ -1,25 +1,25 @@
-export async function loadImage(src) {
-  const img = new Image();
+export function compileShader(gl, shader, source) {
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
 
-  let _resolve;
-  const p = new Promise((resolve) => _resolve = resolve);
+    const log = gl.getShaderInfoLog(shader);
 
-  img.onload = () => {
-    _resolve(img);
-  }
-
-  img.src = src;
-
-  return p;
+    if (log) {
+        throw new Error(log);
+    }
 }
 
-export function compileShader(shader, source) {
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
+export async function loadImage(src) {
+    const img = new Image();
 
-  const log = gl.getShaderInfoLog(shader);
+    let _resolve;
+    const p = new Promise((resolve) => _resolve = resolve);
 
-  if (log) {
-    throw new Error(log);
-  }
+    img.onload = () => {
+        _resolve(img);
+    }
+
+    img.src = src;
+
+    return p;
 }
